@@ -16,6 +16,7 @@
  * to request permission.
  *
  * @author     Nicholas Henry <nichk@standingcloud.com>
+ * @author     Jason Hand     <jason.hand@standingcloud.com>
  * @copyright  2011 Standing Cloud, Inc.
  */
 
@@ -125,7 +126,7 @@ runSystemCommand(
 
 /* Create the Archive */
 runSystemCommand("Creating the initial archive to get things started...", "touch " . DRUPAL_ROOT . "/" . ARCHIVE);
-runSystemCommand("Creating the archive...", "tar --exclude='" . ARCHIVE . "' -cjf " . DRUPAL_ROOT . "/" . ARCHIVE . " " . DRUPAL_ROOT);
+runSystemCommand("Creating the archive...", "tar -C " . DRUPAL_ROOT . " --exclude='" . ARCHIVE . "' -cjf " . DRUPAL_ROOT . "/" . ARCHIVE . " " . DRUPAL_ROOT);
 
 
 /* Cleanup/Remove the Database Dump */
