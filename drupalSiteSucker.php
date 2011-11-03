@@ -125,13 +125,18 @@ runSystemCommand(
 
 
 /* Create the Archive */
+$path_parts = pathinfo(DRUPAL_ROOT);
 runSystemCommand("Creating the initial archive to get things started...", "touch " . DRUPAL_ROOT . "/" . ARCHIVE);
-runSystemCommand("Creating the archive...", "tar -C " . DRUPAL_ROOT . " --exclude='" . ARCHIVE . "' -cjf " . DRUPAL_ROOT . "/" . ARCHIVE . " " . DRUPAL_ROOT);
+runSystemCommand("Creating the archive...", "tar --directory='" . $path_parts['dirname'] . "' --exclude='" . ARCHIVE . "' -cjf " . DRUPAL_ROOT . "/" . ARCHIVE . " " . $path_parts['basename']);
 
 
 /* Cleanup/Remove the Database Dump */
 runSystemCommand("Removing Database Dump...", "rm -f " . DRUPAL_ROOT . "/" . SQL_FILE);
 
+/* If debugging, exit here */
+if(DEBUG) {
+	exit;
+}
 ?>
 
 <html>
