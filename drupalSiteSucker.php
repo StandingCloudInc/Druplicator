@@ -137,29 +137,70 @@ runSystemCommand("Removing Database Dump...", "rm -f " . DRUPAL_ROOT . "/" . SQL
 	<head>
 		<title><?php echo SITE_TITLE; ?></title>
 		<style type="text/css">
-			.warning {
+			.message {
+			    font-size: 20px;
 				border: 1px solid;
 				margin: 10px 0px;
 				padding:15px 10px 15px 50px;
 				background-repeat: no-repeat;
 				background-position: 10px center;
 				color: #9F6000;
-				background-color: #FEEFB3;
+				background-color: #99CCFF;
 				background-image: url('http://trewsoft.com/images/warning.png');
 			}
 		</style>
+		<style type="text/css">
+			.support {
+				border: 1px solid;
+				margin: 0px 0px;
+				padding:5px 5px 5px 5px;
+				background-repeat: no-repeat;
+				background-position: 5px center;
+				color: #9F6000;
+				background-color: #FFFFFF;
+			}
+		</style>
+		
+		<style type="text/css">
+			.buttons {
+				border: 1px solid;
+				margin: 0px 0px;
+				padding:5px 5px 5px 5px;
+				background-repeat: no-repeat;
+				background-position: 5px center;
+				color: #9F6000;
+				background-color: #6699CC;
+			}
+		</style>
 	</head>
-	<body>
-		<h1><?php echo SITE_TITLE; ?></h1>
-
-		<p>
-			Thank you for using Standing Cloud&#39;s &#39;<?php echo SITE_TITLE; ?>&#39; to create a backup of your Drupal Site.
-			Please take a moment to <a href="<?php echo ARCHIVE; ?>">download your backup</a>. Once you have downloaded your
-			backup, please make sure that you <a href="?cleanupAfterDrupalSiteSucker=true">run the cleanup script</a> to remove
-			the backup and Standing Cloud&#39;s &#39;<?php echo SITE_TITLE; ?>&#39; from your web server.
-		</p>
-
-		<div class="warning">WARNING: Make sure that you run the cleanup script so that others may not use the &#39;<?php echo SITE_TITLE; ?>&#39; to gain access to your site&#39;s.</div>
-
-	</body>
+	<body bgcolor=003366>
+		<img src="http://standingcloud.assistly.com/customer/portal/attachments/16587">
+		<img src="http://standingcloud.assistly.com/customer/portal/attachments/10589">
+		
+		<div class="message">Thank you for using the Standing Cloud <?php echo SITE_TITLE; ?> archive utility to create a backup of your Drupal Site.
+		<br>
+			Please take a moment to package and download your Drupal deployment by pressing the green button below. Once you have downloaded the
+			archive file, please make sure that you run the cleanup script by pressing the red button.
+			<br>
+			This will remove the backup and Standing Cloud <?php echo SITE_TITLE; ?> archive utility from your web server.
+	    </div>
+	    
+        <div class="buttons" align=center>
+           <span 30x>
+        	<a href="<?php echo ARCHIVE; ?>"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16435"></a>
+            <a href="?cleanupAfterDrupalSiteSucker=true"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16434"></a>
+        </div>
+        
+        <div class="support" align=center>
+                 <td>Questions?</td>
+                 <br>
+                 <td><a href="http://support.standingcloud.com/customer/portal/chats/new"target="_blank"><img src="http://standingcloud.assistly.com/customer/portal/attachments/15073"></td></a>
+                 <td><a href="http://support.standingcloud.com/customer/portal/emails/new"target="_blank"><img src="http://standingcloud.assistly.com/customer/portal/attachments/15074"></td></a>
+                 <td><a href="http://support.standingcloud.com/customer/portal/questions/new"target="_blank"><img src="http://standingcloud.assistly.com/customer/portal/attachments/15072"></td></a>
+                 <p>
+                 alpha release
+                 <br>
+                 © 2011 Standing Cloud, Inc. All rights reserved.
+                 </p>
+    </body>
 </html>
