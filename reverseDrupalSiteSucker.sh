@@ -73,7 +73,8 @@ fixPermissions ()
 	do
 		# Set the default group as www-data
 		if [ "$thisuser" = "www-data" ]; then
-			chgrp -R www-data ${WWW_CODE_DIR}
+			: # :TODO:11/03/2011 04:53:20 PM MDT:NSH: Need to be root or part of that group to change a file/directory to that group... Can't do this at this time...
+#			chgrp -R www-data ${WWW_CODE_DIR}
 		fi
 
 		# Setting acls for $thisuser
@@ -134,13 +135,14 @@ cd ${OLDPWD}
 mv ${WWW_CODE_DIR} ${TMPFILE}
 
 # Extract the archive to the home directory
-tar --directory="${HOME}" --overwrite -xjf ${ARCHIVE}
+tar --directory="${HOME}" --overwrite --no-same-permissions -xjf ${ARCHIVE}
 
 # If the extracted directory isn't 'htdocs', rename it to htdocs
 [ "${EXTRACT_DIR%/}" != "htdocs" ] && mv ${HOME}/${EXTRACT_DIR%/} ${WWW_CODE_DIR}
 
 # Recreate the database and then restore the database from the archive
-mysql --host="${MY_HOST}" --user="${MY_USER}" --password="${MY_PASS}" --database="${MY_NAME}" --execute="DROP DATABASE IF EXISTS ${MY_NAME}; CREATE DATABASE IF NOT EXISTS ${MY_NAME};"
+sed -i -e "/^CREATE DATABASE/d" -e "/^USE/d" ${WWW_CODE_DIR}/${SQL_FILE}
+mysql --host="${MY_HOST}" --user="${MY_USER}" --password="${MY_PASS}" --database="${MY_NAME}" --execute="DROP DATABASE IF EXISTS ${MY_NAME}; CREATE DATABASE ${MY_NAME};"
 mysql --host="${MY_HOST}" --user="${MY_USER}" --password="${MY_PASS}" --database="${MY_NAME}" < ${WWW_CODE_DIR}/${SQL_FILE}
 
 # Remove the database from the extracted archive
@@ -157,7 +159,7 @@ sed -i "s/^\(\s*'username'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_USER}\2/" ${WWW_CODE_DI
 sed -i "s/^\(\s*'password'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_PASS}\2/" ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
 sed -i "s/^\(\s*'host'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_HOST}\2/"     ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
 
-if [ ${problemWithInlineChanges} =='yes' ]; then
+if [ "${problemWithInlineChanges}" == 'yes' ]; then
 	echo -e "\n\n\e[1;31mNOTICE:\033[0m Moving your 'sites/default/settings.php' to '${HOME}/tmp/settings.php' and replacing with the original settings.php (So that your application will be able to connect to the database)\n\n"
 	cp -a /tmp/htdocs/sites/default/settings.php ${WWW_CODE_DIR}/sites/default/settings.php
 fi
