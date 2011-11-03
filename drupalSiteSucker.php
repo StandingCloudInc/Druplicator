@@ -207,7 +207,7 @@ if(DEBUG) {
                  <p>
                  alpha release
                  <br>
-                 © 2011 Standing Cloud, Inc. All rights reserved.
+                 &copy; 2011 Standing Cloud, Inc. All rights reserved.
                  </p>
     </body>
 </html>
