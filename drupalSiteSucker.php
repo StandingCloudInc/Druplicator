@@ -26,6 +26,7 @@
 define('ARCHIVE', 'tarArchive.tar.bz2');
 define('SQL_FILE', 'mysqlDatabaseDump.sql');
 define('SITE_TITLE', 'Drupal Site Sucker');
+define('SCRIPT_TITLE', 'drupalSiteSucker.php');
 
 /**
  * Turn debugging on/off.
@@ -127,7 +128,7 @@ runSystemCommand(
 /* Create the Archive */
 $path_parts = pathinfo(DRUPAL_ROOT);
 runSystemCommand("Creating the initial archive to get things started...", "touch " . DRUPAL_ROOT . "/" . ARCHIVE);
-runSystemCommand("Creating the archive...", "tar --directory='" . $path_parts['dirname'] . "' --exclude='" . ARCHIVE . "' -cjf " . DRUPAL_ROOT . "/" . ARCHIVE . " " . $path_parts['basename']);
+runSystemCommand("Creating the archive...", "tar --directory='" . $path_parts['dirname'] . "' --exclude='" . ARCHIVE . "' --exclude='" . SCRIPT_TITLE . "' -cjf " . DRUPAL_ROOT . "/" . ARCHIVE . " " . $path_parts['basename']);
 
 
 /* Cleanup/Remove the Database Dump */
