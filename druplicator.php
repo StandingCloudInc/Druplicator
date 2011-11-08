@@ -100,6 +100,7 @@ if($_GET["cleanupAfterDruplicator"] == "true")
 	unlink(__FILE__);
 
 	// Quit here, do not keep going down the script
+	echo "\n<br />DONE - Cleaning up after the Druplicator Script!  You may now close this window.";
 	exit;
 }
 
