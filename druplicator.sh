@@ -1,23 +1,23 @@
 #!/bin/bash - 
 #===============================================================================
 #
-#          FILE:  reverseDrupalSiteSucker.sh
+#          FILE:  druplicator.sh
 # 
-#         USAGE:  ./reverseDrupalSiteSucker.sh 
+#         USAGE:  ./druplicator.sh 
 # 
-#   DESCRIPTION:  Reverses the 'Drupal Site Sucker'
+#   DESCRIPTION:  
 # 
-#       OPTIONS:  $1 - the full path to the archive created with the site sucker
+#       OPTIONS:  ---
 #  REQUIREMENTS:  ---
 #          BUGS:  ---
 #         NOTES:  ---
 #        AUTHOR: Nick Henry (NSH), nickh@standingcloud.com
 #       COMPANY: Standing Cloud, Inc.
-#       CREATED: 11/03/2011 12:31:33 PM MDT
+#       CREATED: 11/08/2011 08:59:35 AM MST
 #      REVISION:  ---
 #===============================================================================
 
-#set -o nounset                                  # treat unset variables as errors
+#set -o nounset                                 # Treat unset variables as an error
 
 #===============================================================================
 #   GLOBAL DECLARATIONS

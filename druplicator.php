@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Site Sucker For Drupal
+ * Druplicator
  *
- * The 'Site Sucker For Drupal Script' automatically finds your Drupal site's
+ * The 'Druplicator' automatically finds your Drupal site's
  * database credentials and then creates an archive of your database and all of
  * your files and then presents you with an easy way to download this archive.
  * Once downloaded, the script asks you to allow it to clean up after itself
@@ -25,8 +25,8 @@
  */
 define('ARCHIVE', 'tarArchive.tar.bz2');
 define('SQL_FILE', 'mysqlDatabaseDump.sql');
-define('SITE_TITLE', 'Drupal Site Sucker');
-define('SCRIPT_TITLE', 'drupalSiteSucker.php');
+define('SITE_TITLE', 'Druplicator');
+define('SCRIPT_TITLE', 'druplicator.php');
 
 /**
  * Turn debugging on/off.
@@ -91,9 +91,9 @@ function runSystemCommand($msg,$cmd)
 /**
  * Check to see if we are supposed to cleanup.  If so, cleanup and then exit ASAP.
  */
-if($_GET["cleanupAfterDrupalSiteSucker"] == "true")
+if($_GET["cleanupAfterDruplicator"] == "true")
 {
-	echo "Cleaning up after the Drupal Site Sucker Script!";
+	echo "Cleaning up after the Druplicator Script!";
 	runSystemCommand("Deleting the Archive...", "rm -f " . DRUPAL_ROOT . "/" . ARCHIVE);
 
 	// Delete Self (i.e. this script)...
@@ -195,7 +195,7 @@ if(DEBUG) {
         <div class="buttons" align=center>
            <span 30x>
         	<a href="<?php echo ARCHIVE; ?>"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16435"></a>
-            <a href="?cleanupAfterDrupalSiteSucker=true"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16434"></a>
+            <a href="?cleanupAfterDruplicator=true"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16434"></a>
         </div>
         
         <div class="support" align=center>
