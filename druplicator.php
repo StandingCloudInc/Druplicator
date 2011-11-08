@@ -93,14 +93,27 @@ function runSystemCommand($msg,$cmd)
  */
 if($_GET["cleanupAfterDruplicator"] == "true")
 {
-	echo "Cleaning up after the Druplicator Script!";
+	?>
+	<html>
+	<head>
+		<title><?php echo SITE_TITLE; ?></title>
+	</head>
+	<body>
+	<p>Cleaning up after the Druplicator Script!</p>
+
+	<?php
 	runSystemCommand("Deleting the Archive...", "rm -f " . DRUPAL_ROOT . "/" . ARCHIVE);
 
 	// Delete Self (i.e. this script)...
 	unlink(__FILE__);
 
+	?>
+
+	<p>DONE - Cleaning up after the Druplicator Script!  <a href="/">Click here to return to your homepage</a>.</p>
+	</html>
+
+	<?php
 	// Quit here, do not keep going down the script
-	echo "\n<br />DONE - Cleaning up after the Druplicator Script!  You may now close this window.";
 	exit;
 }
 
