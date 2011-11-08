@@ -181,7 +181,7 @@ if(DEBUG) {
 		</style>
 	</head>
 	<body bgcolor=003366>
-		<img src="http://standingcloud.assistly.com/customer/portal/attachments/16587">
+		<img src="http://standingcloud.assistly.com/customer/portal/attachments/17250">
 		<img src="http://standingcloud.assistly.com/customer/portal/attachments/10589">
 		
 		<div class="message">Thank you for using the Standing Cloud <?php echo SITE_TITLE; ?> archive utility to create a backup of your Drupal Site.
