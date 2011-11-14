@@ -27,6 +27,7 @@ define('ARCHIVE', 'tarArchive.tar.bz2');
 define('SQL_FILE', 'mysqlDatabaseDump.sql');
 define('SITE_TITLE', 'Druplicator');
 define('SCRIPT_TITLE', 'druplicator.php');
+define('BACKUP_DIR_NAME', 'standing_clouds_druplicator');
 
 /**
  * Turn debugging on/off.
@@ -43,6 +44,16 @@ define('DEBUG', false);
 define('DRUPAL_ROOT', getcwd());
 require_once DRUPAL_ROOT . '/sites/default/settings.php';
 $default_db = $databases['default']['default'];
+
+
+/**
+ * Every server is different...  We will try to write to these directories...
+ */
+$possiblyWritableDirectories = array(
+	DRUPAL_ROOT . "/sites/default/files",
+	DRUPAL_ROOT,
+	"/tmp"
+);
 
 
 /**
@@ -102,7 +113,14 @@ if($_GET["cleanupAfterDruplicator"] == "true")
 	<p>Cleaning up after the Druplicator Script!</p>
 
 	<?php
-	runSystemCommand("Deleting the Archive...", "rm -f " . DRUPAL_ROOT . "/" . ARCHIVE);
+	outputDebug("Looping through possible directories, looking for files and folders to clean up...");
+	foreach($possiblyWritableDirectories  as $dir) {
+		if(is_dir("${dir}/" . BACKUP_DIR_NAME)) {
+			if(is_file("${dir}/" . BACKUP_DIR_NAME . "/" . ARCHIVE)) { unlink("${dir}/" . BACKUP_DIR_NAME . "/" . ARCHIVE); }
+			if(is_file("${dir}/" . BACKUP_DIR_NAME . "/" . SQL_FILE)) { unlink("${dir}/" . BACKUP_DIR_NAME . "/" . SQL_FILE); }
+			rmdir("${dir}/" . BACKUP_DIR_NAME);
+		}
+	}
 
 	// Delete Self (i.e. this script)...
 	unlink(__FILE__);
@@ -116,6 +134,46 @@ if($_GET["cleanupAfterDruplicator"] == "true")
 	// Quit here, do not keep going down the script
 	exit;
 }
+
+
+/**
+ * Every server is different...  Loop through the list of $possiblyWritableDirectories and
+ * figure out which directories we can write to, and which directories we can't...
+ */
+
+/* Figure out where we can store our backups to... */
+$WRITE_DIR='';
+foreach($possiblyWritableDirectories  as $dir) {
+	if(is_dir("${dir}/" . BACKUP_DIR_NAME)) {
+		$WRITE_DIR= "${dir}/" . BACKUP_DIR_NAME;
+		outputDebug("WRITE_DIR already exists and = ${WRITE_DIR}");
+		break;
+	} else {
+		if(mkdir("${dir}/" . BACKUP_DIR_NAME)) {
+		    $WRITE_DIR= "${dir}/" . BACKUP_DIR_NAME;
+			outputDebug("WRITE_DIR = ${WRITE_DIR}");
+			break;
+		} else {
+			outputDebug("Could not create directory: ${dir}/" . BACKUP_DIR_NAME);
+		}
+	}
+} unset($dir);
+
+/* Display error and exit if we can't write to any of these directories... */
+if(empty($WRITE_DIR)) {
+    echo 'ERROR: Could not find a directory to backup to.';
+	exit(1);
+}
+
+/* Figure out if the directory we can write to is inside of Drupal's root directory */
+$pos = strpos($WRITE_DIR,DRUPAL_ROOT);
+if($pos === false) {
+	outputDebug("WRITE_DIR was NOT in DRUPAL_ROOT");
+	$WRITEDIR_IN_DRUPALROOT = false; // needle NOT found in haystack
+} else {
+	outputDebug("WRITE_DIR was in DRUPAL_ROOT");
+	$WRITEDIR_IN_DRUPALROOT = true; // needle found in haystack
+} unset($pos);
 
 
 /**
@@ -135,18 +193,20 @@ outputDebug("  Collation: " . $default_db['collation']);
 /* Backup the Database */
 runSystemCommand(
 	"Dumping Database...",
-	"mysqldump --complete-insert --host='" . $default_db['host'] . "' --user='" . $default_db['username'] . "' --password='" . $default_db['password'] . "' --databases '" . $default_db['database'] . "' > " . DRUPAL_ROOT . "/" . SQL_FILE
+	"mysqldump --complete-insert --host='" . $default_db['host'] . "' --user='" . $default_db['username'] . "' --password='" . $default_db['password'] . "' --databases '" . $default_db['database'] . "' > ${WRITE_DIR}/" . SQL_FILE
 );
-
 
 /* Create the Archive */
 $path_parts = pathinfo(DRUPAL_ROOT);
-runSystemCommand("Creating the initial archive to get things started...", "touch " . DRUPAL_ROOT . "/" . ARCHIVE);
-runSystemCommand("Creating the archive...", "tar --directory='" . $path_parts['dirname'] . "' --exclude='" . ARCHIVE . "' --exclude='" . SCRIPT_TITLE . "' -cjf " . DRUPAL_ROOT . "/" . ARCHIVE . " " . $path_parts['basename']);
-
+if ($WRITEDIR_IN_DRUPALROOT) {
+	runSystemCommand("Creating the archive...", "tar --directory='" . $path_parts['dirname'] . "' --exclude='" . ARCHIVE . "' --exclude='" . SCRIPT_TITLE . "' -cjf ${WRITE_DIR}/" . ARCHIVE . " " . $path_parts['basename']);
+} else {
+	runSystemCommand("Creating the archive - write dir is outside of drupal root...", "tar --directory='" . $path_parts['dirname'] . "' --exclude='" . ARCHIVE . "' --exclude='" . SCRIPT_TITLE . "' -cjf ${WRITE_DIR}/" . ARCHIVE . " " . $path_parts['basename'] . " ${WRITE_DIR}");
+}
 
 /* Cleanup/Remove the Database Dump */
-runSystemCommand("Removing Database Dump...", "rm -f " . DRUPAL_ROOT . "/" . SQL_FILE);
+outputDebug("Removing Database Dump...");
+unlink("${WRITE_DIR}/" . SQL_FILE);
 
 /* If debugging, exit here */
 if(DEBUG) {
@@ -208,8 +268,12 @@ if(DEBUG) {
 	    
         <div class="buttons" align=center>
            <span 30x>
-        	<a href="<?php echo ARCHIVE; ?>"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16435"></a>
-            <a href="?cleanupAfterDruplicator=true"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16434"></a>
+			<?php if ($WRITEDIR_IN_DRUPALROOT) { ?>
+				<a href="<?php echo str_replace(DRUPAL_ROOT, '', $WRITE_DIR) . "/" . ARCHIVE; ?>"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16435"></a>
+			<?php } else { ?>
+				<p>Because of your server&#39;s permissions, we were unable to store your backup inside of Drupal&#39;s root folder; therefore, you cannot simply download the file with your web browser.  Please use FTP or some other program to access your archive: <em><?php echo "${WRITE_DIR}/" . ARCHIVE; ?></em></p>
+			<?php } ?>
+				<a href="?cleanupAfterDruplicator=true"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16434"></a>
         </div>
         
         <div class="support" align=center>
