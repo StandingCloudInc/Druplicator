@@ -31,11 +31,13 @@ declare -rx SCRIPT=${0##*/}                     # the name of this script
 ARCHIVE=${1}                                    # the archive if passed
 ARCHIVE=${ARCHIVE:-"${HOME}/tmp/tarArchive.tar.bz2"}  # the archive if not passed
 EXTRACT_DIR=$(tar tjf ${ARCHIVE} 2>/dev/null | head -1)
-SQL_FILE='mysqlDatabaseDump.sql'
 TMPFILE=$( mktemp /tmp/htdocs.XXXXXXXXXX ) || exit 1 ; rm --force ${TMPFILE}
 WWW_CODE_DIR="${HOME}/htdocs"
 SC_SYSUSER='sc-sysuser'
 SYSTEM_USER="$(whoami)"
+SQL_FILE='mysqlDatabaseDump.sql'
+BACKUP_DIR_NAME='standing_clouds_druplicator'
+POSSIBLE_LOCATIONS_FOR_SQL_FILE="${WWW_CODE_DIR}/sites/default/files/${BACKUP_DIR_NAME} ${WWW_CODE_DIR}/${BACKUP_DIR_NAME} ${HOME}/tmp/${BACKUP_DIR_NAME}"
 
 
 #===  FUNCTION  ================================================================
@@ -141,16 +143,30 @@ mv ${WWW_CODE_DIR} ${TMPFILE}
 # Extract the archive to the home directory
 tar --directory="${HOME}" --overwrite --no-same-permissions -xjf ${ARCHIVE}
 
+# Find the sql file
+LOCATION_OF_SQL_FILE=''
+for dir in $POSSIBLE_LOCATIONS_FOR_SQL_FILE; do
+	if [ -f "${dir}/${SQL_FILE}" ]; then
+		LOCATION_OF_SQL_FILE="${dir}/${SQL_FILE}"
+		break
+	fi
+done
+if [ -z "$LOCATION_OF_SQL_FILE" ] ; then
+	printf "$SCRIPT:$LINENO: could not find a sql file to restore\n" >&2
+	exit 192
+fi
+
 # If the extracted directory isn't 'htdocs', rename it to htdocs
 [ "${EXTRACT_DIR%/}" != "htdocs" ] && mv ${HOME}/${EXTRACT_DIR%/} ${WWW_CODE_DIR}
 
 # Recreate the database and then restore the database from the archive
-sed -i -e "/^CREATE DATABASE/d" -e "/^USE/d" ${WWW_CODE_DIR}/${SQL_FILE}
+sed -i -e "/^CREATE DATABASE/d" -e "/^USE/d" ${LOCATION_OF_SQL_FILE}
 mysql --host="${MY_HOST}" --user="${MY_USER}" --password="${MY_PASS}" --database="${MY_NAME}" --execute="DROP DATABASE IF EXISTS ${MY_NAME}; CREATE DATABASE ${MY_NAME};"
-mysql --host="${MY_HOST}" --user="${MY_USER}" --password="${MY_PASS}" --database="${MY_NAME}" < ${WWW_CODE_DIR}/${SQL_FILE}
+mysql --host="${MY_HOST}" --user="${MY_USER}" --password="${MY_PASS}" --database="${MY_NAME}" < ${LOCATION_OF_SQL_FILE}
 
 # Remove the database from the extracted archive
-rm -f ${WWW_CODE_DIR}/${SQL_FILE}
+rm -f ${LOCATION_OF_SQL_FILE}
+rmdir ${LOCATION_OF_SQL_FILE%/*}
 
 
 #-------------------------------------------------------------------------------
