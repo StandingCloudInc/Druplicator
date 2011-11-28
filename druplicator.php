@@ -105,14 +105,15 @@ function runSystemCommand($msg,$cmd)
 if($_GET["cleanupAfterDruplicator"] == "true")
 {
 	?>
-	<html>
-	<head>
-		<title><?php echo SITE_TITLE; ?></title>
-	</head>
-	<body>
-	<p>Cleaning up after the Druplicator Script!</p>
+<html>
+<head>
+<title><?php echo SITE_TITLE; ?></title>
 
-	<?php
+</head>
+<body>
+<div class="wrapper">
+<!--<p>Cleaning up after the Druplicator Script!</p>
+--><?php
 	outputDebug("Looping through possible directories, looking for files and folders to clean up...");
 	foreach($possiblyWritableDirectories  as $dir) {
 		if(is_dir("${dir}/" . BACKUP_DIR_NAME)) {
@@ -126,14 +127,17 @@ if($_GET["cleanupAfterDruplicator"] == "true")
 	unlink(__FILE__);
 
 	?>
-
-	<p>DONE - Cleaning up after the Druplicator Script!  <a href="/">Click here to return to your homepage</a>.</p>
-	</html>
-
-	<?php
+<h2>DONE - Cleaning up after the Druplicator Script!</h2> 
+<div><p><a class="download_btn" href="/">Return to your homepage</a></p></div>
+</div>
+</body>
+</html>
+<?php
 	// Quit here, do not keep going down the script
 	exit;
 }
+
+
 
 
 /**
@@ -213,79 +217,124 @@ if(DEBUG) {
 	exit;
 }
 ?>
-
 <html>
-	<head>
-		<title><?php echo SITE_TITLE; ?></title>
-		<style type="text/css">
-			.message {
-			    font-size: 20px;
-				border: 1px solid;
-				margin: 10px 0px;
-				padding:15px 10px 15px 50px;
-				background-repeat: no-repeat;
-				background-position: 10px center;
-				color: #9F6000;
-				background-color: #99CCFF;
-				background-image: url('http://trewsoft.com/images/warning.png');
-			}
-		</style>
-		<style type="text/css">
-			.support {
-				border: 1px solid;
-				margin: 0px 0px;
-				padding:5px 5px 5px 5px;
-				background-repeat: no-repeat;
-				background-position: 5px center;
-				color: #9F6000;
-				background-color: #FFFFFF;
-			}
-		</style>
-		
-		<style type="text/css">
-			.buttons {
-				border: 1px solid;
-				margin: 0px 0px;
-				padding:5px 5px 5px 5px;
-				background-repeat: no-repeat;
-				background-position: 5px center;
-				color: #9F6000;
-				background-color: #6699CC;
-			}
-		</style>
-	</head>
-	<body bgcolor=003366>
-		<img src="http://standingcloud.assistly.com/customer/portal/attachments/17250">
-		<img src="http://standingcloud.assistly.com/customer/portal/attachments/10589">
-		
-		<div class="message">Thank you for using the Standing Cloud <?php echo SITE_TITLE; ?> archive utility to create a backup of your Drupal Site.
-		<br>
-			Please take a moment to package and download your Drupal deployment by pressing the green button below. Once you have downloaded the
-			archive file, please make sure that you run the cleanup script by pressing the red button.
-			<br>
-			This will remove the backup and Standing Cloud <?php echo SITE_TITLE; ?> archive utility from your web server.
-	    </div>
-	    
-        <div class="buttons" align=center>
-           <span 30x>
-			<?php if ($WRITEDIR_IN_DRUPALROOT) { ?>
-				<a href="<?php echo str_replace(DRUPAL_ROOT, '', $WRITE_DIR) . "/" . ARCHIVE; ?>"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16435"></a>
-			<?php } else { ?>
-				<p>Because of your server&#39;s permissions, we were unable to store your backup inside of Drupal&#39;s root folder; therefore, you cannot simply download the file with your web browser.  Please use FTP or some other program to access your archive: <em><?php echo "${WRITE_DIR}/" . ARCHIVE; ?></em></p>
-			<?php } ?>
-				<a href="?cleanupAfterDruplicator=true"><img src="http://standingcloud.assistly.com/customer/portal/attachments/16434"></a>
-        </div>
-        
-        <div class="support" align=center>
-                 <td>Questions?</td>
-                 <br>
-                 <td><a href="http://support.standingcloud.com/customer/portal/chats/new"target="_blank"><img src="http://standingcloud.assistly.com/customer/portal/attachments/15073"></td></a>
-                 <td><a href="http://support.standingcloud.com/customer/portal/emails/new"target="_blank"><img src="http://standingcloud.assistly.com/customer/portal/attachments/15074"></td></a>
-                 <td><a href="http://support.standingcloud.com/customer/portal/questions/new"target="_blank"><img src="http://standingcloud.assistly.com/customer/portal/attachments/15072"></td></a>
-                 <p>
-                 alpha release
-                 <br>
-                 &copy; 2011 Standing Cloud, Inc. All rights reserved.
-                 </p>
-    </body>
+<head>
+<title><?php echo SITE_TITLE; ?></title>
+<style type="text/css">
+body {
+	background: url('http://www.druplicator.com/images/bg.png') repeat-x #0b6290;
+	font-family:  Helvetica, sans-serif;
+		color: #5d5b5b;
+
+}
+.wrapper {
+	width: 800px;
+	margin: 0 auto;
+	/*	border: 1px solid #5d5b5b;
+*/	padding: 24px;
+}
+.btn_wrapper {
+	width: 800px;
+	float: left;
+}
+.message {
+	font-size: 14px;
+	line-height: 1.4em;
+	background-repeat: no-repeat;
+	background-position: 10px center;
+	float: left;
+	width: 500px;
+	line-height: 1.8em;
+}
+h1 {
+	font-size: 40px;
+	color: #236688;
+	font-weight: bold;
+	text-transform:uppercase;
+	text-shadow: 0px 1px 1px #fff;
+	padding: 0px;
+	margin: 0px;
+	line-height: 1.6em;
+}
+h2 {
+	font-size: 18px;
+	color: #236688;
+	text-shadow: 0px 1px 1px #fff;
+	line-height: 0em;
+	margin: 0px;
+}
+.support {
+	margin: 0px 0px;
+	padding:5px 5px 5px 5px;
+	color: #5d5b5b;
+	font-size: 14px;
+	text-align: left;
+	line-height: 1.4em;
+	float: left;
+}
+.buttons {
+	float: left;
+	width: 200px;
+	height: 100px;
+	margin: 0px 0px;
+	color: #5d5b5b;
+	font-size: 14px;
+	padding: 10px 0px 0px 24px;
+}
+a:link.download_btn, a:visited.download_btn {
+	background: url('http://www.druplicator.com/images/download_btn.png') no-repeat;
+	color: white;
+	width: 181px;
+	height: 59px;
+	display: block;
+	padding: 8px 0px 12px 0px;
+	text-align: center;
+	font-size: 18px;
+	font-weight: bold;
+	text-shadow: 0px 1px 1px #828282;
+	text-decoration: none;
+	line-height: 1.0em;
+
+}
+a:hover.download_btn {
+	background: url('http://www.druplicator.com/images/download_btn.png') no-repeat;
+	color: white;
+	text-decoration: none;
+}
+.bold {
+	font-weight: bold;
+}
+.rule {
+	border-bottom: 1px #fff solid;
+	text-shadow: 0px 1px 1px #fff;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<h1>Druplicator</h1>
+<h2>Standing Cloud archive utility for Drupal</h2>
+
+<!--/*<img src="http://standingcloud.assistly.com/customer/portal/attachments/10589">
+*/-->
+<div class="rule">&nbsp;</div>
+<p class="bold">Thank you for using the Druplicator to create an archive of your Drupal site.</p>
+<div class="btn_wrapper">
+  <div class="message">
+    <p><span class="bold">Step one:</span> Package and download your Drupal site. </p>
+  </div>
+  <div class="buttons">
+    <?php if ($WRITEDIR_IN_DRUPALROOT) { ?>
+    <a class="download_btn" href="<?php echo str_replace(DRUPAL_ROOT, '', $WRITE_DIR) . "/" . ARCHIVE; ?>Package and download</a>
+    <?php } ?>
+  </div>
+</div>
+<div class="btn_wrapper">
+  <div class="message">
+    <p><span class="bold">Step two:</span> Once you have downloaded the archive file, run the cleanup script. This will remove the backup and Druplicator utility from your web server.</p>
+  </div>
+  <div class="buttons"> <a class="download_btn" href="?cleanupAfterDruplicator=true">Run cleanup<br />
+    script</a></div>
+</div>
+</body>
 </html>
