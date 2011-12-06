@@ -15,8 +15,10 @@
  * permission of Standing Cloud, Inc. Contact us at support@standingcloud.com
  * to request permission.
  *
- * @author     Nicholas Henry <nichk@standingcloud.com>
+ * @author     Nicholas Henry <nickh@standingcloud.com>
  * @author     Jason Hand     <jason.hand@standingcloud.com>
+ * @author     Amy Kokta      <amy.kokta@standingcloud.com>
+ *
  * @copyright  2011 Standing Cloud, Inc.
  */
 

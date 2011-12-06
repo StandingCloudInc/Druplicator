@@ -36,9 +36,11 @@ Contributors
 
 * Nicholas Henry, alias [nshenry03][1]
 * Jason Hand, alias [jasonhand][2]
+* Amy Kokta, alias [akokta][3]
 
 [1]: https://github.com/nshenry03
 [2]: https://github.com/jasonhand
+[3]: https://github.com/akokta
 
 
 TODO
