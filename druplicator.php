@@ -22,6 +22,7 @@
  * @copyright  2011 Standing Cloud, Inc.
  */
 
+
 /**
  * Define constants
  */
@@ -37,12 +38,11 @@ define('BACKUP_DIR_NAME', 'standing_clouds_druplicator');
  *   Set this value to 'true' if you want to turn debugging on.
  *   Set this value to 'false' if you want to turn debugging off.
  */
-define('DEBUG', true);
+define('DEBUG', false);
 
 
 /**
- * Include the site's configuration file and set the default_db (to make life 
- * easier).
+ * Include the site's configuration file
  */
 define('DRUPAL_ROOT', getcwd());
 
@@ -151,6 +151,28 @@ function runSystemCommand($msg,$cmd) {
 }
 
 
+/**
+ * FUNCTION: backupDatabase
+ *
+ * @param string $arg1 the database driver (mysql, mysqli, sqlite, pgsql, etc.)
+
+ * @param string $arg2 the command to run
+ *
+ * @return void
+ */
+function backupDatabase($driver,$database,$username,$password,$host,$port,$backup_dir) { 
+	if ($driver === 'mysql' || $driver === 'mysqli') {
+		if(empty($port)) { $port = 3306; }
+		runSystemCommand(
+			"Dumping Database...",
+			"mysqldump --complete-insert --databases '${database}' --user='${username}' --password='${password}' --host='${host}' --port='${port}' > ${backup_dir}/" . SQL_FILE
+		);
+	} else {
+		outputError "Sorry, we only support MySQL databases at this time.";
+	}
+}
+
+
 /* =============================================================================
    =                       START MAIN SCRIPT LOGIC
    ============================================================================= */
@@ -182,7 +204,38 @@ if (isset($fileFoundWithVersionInformation)) {
  * Find database information
  */
 require_once DRUPAL_ROOT . '/sites/default/settings.php';
-$default_db = $databases['default']['default'];
+
+if(isset($databases)) {
+	$default_db = $databases['default']['default'];
+	$DATABASE_DRIVER = $default_db['driver'];
+	$DATABASE_DATABASE = $default_db['database'];
+	$DATABASE_USERNAME = $default_db['username'];
+	$DATABASE_PASSWORD = $default_db['password'];
+	$DATABASE_HOST = $default_db['host'];
+	$DATABASE_PORT = $default_db['port'];
+	$DATABASE_COLLATION = $default_db['collation'];
+	$DATABASE_PREFIX = $default_db['prefix'];
+} elseif(isset($db_url)) {
+	$url = parse_url(is_array($db_url) ? $db_url['default'] : $db_url);
+	$DATABASE_DRIVER = urldecode($url['scheme']);
+	$DATABASE_DATABASE = ltrim(urldecode($url['path']), '/');
+	$DATABASE_USERNAME = urldecode($url['user']);
+	$DATABASE_PASSWORD = isset($url['pass']) ? urldecode($url['pass']) : NULL;
+	$DATABASE_HOST = urldecode($url['host']);
+	$DATABASE_PORT = isset($url['port']) ? urldecode($url['port']) : '';
+	$DATABASE_COLLATION = isset($db_collation) ? $db_collation : '';
+	$DATABASE_PREFIX = isset($db_prefix) ? $db_prefix : '';
+}
+
+outputDebug("Database Information:");
+outputDebug("  Driver:    ${DATABASE_DRIVER}");
+outputDebug("  Database:  ${DATABASE_DATABASE}");
+outputDebug("  Username:  ${DATABASE_USERNAME}");
+outputDebug("  Password:  ${DATABASE_PASSWORD}");
+outputDebug("  Host:      ${DATABASE_HOST}");
+outputDebug("  Port:      ${DATABASE_PORT}");
+outputDebug("  Collation: ${DATABASE_COLLATION}");
+outputDebug("  Prefix:    ${DATABASE_PREFIX}");
 
 
 /**
@@ -279,9 +332,9 @@ if(isset($_GET["cleanupAfterDruplicator"])) { ?>
 					text-shadow: 0px 1px 1px #fff;
 				}
 			</style>
-	</head>
-	<body>
-		<div class="wrapper"> 
+		</head>
+		<body>
+			<div class="wrapper"> 
 <?php
 	outputDebug("Looping through possible directories, looking for files and folders to clean up...");
 	foreach($possiblyWritableDirectories as $dir) {
@@ -296,11 +349,11 @@ if(isset($_GET["cleanupAfterDruplicator"])) { ?>
 	unlink(__FILE__);
 
 ?>
-			<h2>DONE - Cleaning up after the Druplicator Script!</h2>
-			<div><p><a class="download_btn" href="/">Return to your homepage</a></p></div>
-		</div>
-	</body>
-</html>
+				<h2>DONE - Cleaning up after the Druplicator Script!</h2>
+				<div><p><a class="download_btn" href="/">Return to your homepage</a></p></div>
+			</div>
+		</body>
+	</html>
 <?php
 	// Quit here, do not keep going down the script
 	exit;
@@ -311,7 +364,6 @@ if(isset($_GET["cleanupAfterDruplicator"])) { ?>
  * Every server is different...  Loop through the list of $possiblyWritableDirectories and
  * figure out which directories we can write to, and which directories we can't...
  */
-
 /* Figure out where we can store our backups to... */
 $WRITE_DIR='';
 foreach($possiblyWritableDirectories  as $dir) {
@@ -347,24 +399,10 @@ if($pos === false) {
 
 
 /**
- * Before we get too far, output some debugging information that may be helpful
- * if we run into problems.
+ * Perform the backup
  */
-outputDebug("Database Information:");
-outputDebug("  Driver: "    . $default_db['driver']);
-outputDebug("  Database: "  . $default_db['database']);
-outputDebug("  Username: "  . $default_db['username']);
-outputDebug("  Password: "  . $default_db['password']);
-outputDebug("  Host: "      . $default_db['host']);
-outputDebug("  Prefix: "    . $default_db['prefix']);
-outputDebug("  Collation: " . $default_db['collation']);
-
-
 /* Backup the Database */
-runSystemCommand(
-	"Dumping Database...",
-	"mysqldump --complete-insert --host='" . $default_db['host'] . "' --user='" . $default_db['username'] . "' --password='" . $default_db['password'] . "' --databases '" . $default_db['database'] . "' > ${WRITE_DIR}/" . SQL_FILE
-);
+backupDatabase($DATABASE_DRIVER,$DATABASE_DATABASE,$DATABASE_USERNAME,$DATABASE_PASSWORD,$DATABASE_HOST,$DATABASE_PORT,$WRITE_DIR);
 
 /* Create the Archive */
 $path_parts = pathinfo(DRUPAL_ROOT);
