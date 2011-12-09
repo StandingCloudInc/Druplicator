@@ -168,7 +168,7 @@ function backupDatabase($driver,$database,$username,$password,$host,$port,$backu
 			"mysqldump --complete-insert --databases '${database}' --user='${username}' --password='${password}' --host='${host}' --port='${port}' > ${backup_dir}/" . SQL_FILE
 		);
 	} else {
-		outputError "Sorry, we only support MySQL databases at this time.";
+		outputError("Sorry, we only support MySQL databases at this time.");
 	}
 }
 
@@ -213,7 +213,7 @@ if(isset($databases)) {
 	$DATABASE_PASSWORD = $default_db['password'];
 	$DATABASE_HOST = $default_db['host'];
 	$DATABASE_PORT = $default_db['port'];
-	$DATABASE_COLLATION = $default_db['collation'];
+	$DATABASE_COLLATION = isset($default_db['collation']) ? $default_db['collation'] : '';
 	$DATABASE_PREFIX = $default_db['prefix'];
 } elseif(isset($db_url)) {
 	$url = parse_url(is_array($db_url) ? $db_url['default'] : $db_url);
