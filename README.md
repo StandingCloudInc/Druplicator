@@ -2,9 +2,9 @@ Standing Cloud's Druplicator
 ============================
 
 * Author:    Nicholas Henry (<nickh@standingcloud.com>)
-* Date:      November 8, 2011
-* Last mod.: November, 2011
-* Version:   0.0.1
+* Date:      Fri Dec  9 21:34:54 UTC 2011
+* Last mod.: Fri Dec 9 13:48:48 2011 -0700
+* Version:   0.0.2
 * Website:   <http://www.druplicator.com/>
 * GitHub:    <https://github.com/StandingCloudInc/Druplicator>
 
@@ -46,10 +46,7 @@ Contributors
 TODO
 ----
 
-1. Add support for other versions of Drupal (6.x).
-2. Output (display) the version of Drupal that your site is currently running.
-3. Display a warning message if you are exporting from an untested version of Drupal.
-4. Check for multi-site and handle (even if 'handle' is just warn or errorout at this time).
-5. Check for/handle lack of common commands (tar/touch/mysqldump/etc...).
-6. Add support to other operating systems: Windows, Mac.
-7. Any ideas? Tell me!
+1. Check for multi-site and handle (even if 'handle' is just warn or errorout at this time).
+2. Check for/handle lack of common commands (tar/touch/mysqldump/etc...).
+3. Add support to other operating systems: Windows, Mac.
+4. Any ideas? Tell me!

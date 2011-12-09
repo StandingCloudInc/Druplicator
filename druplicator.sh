@@ -14,7 +14,6 @@
 #        AUTHOR: Nick Henry (NSH), nickh@standingcloud.com
 #       COMPANY: Standing Cloud, Inc.
 #       CREATED: 11/08/2011 08:59:35 AM MST
-#      REVISION:  ---
 #
 #       LICENSE:  You may not use, copy, or modify this software without the
 #                 permission of Standing Cloud, Inc. Contact us at
