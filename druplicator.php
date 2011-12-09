@@ -19,7 +19,7 @@
  * @author     Jason Hand     <jason.hand@standingcloud.com>
  * @author     Amy Kokta      <amy.kokta@standingcloud.com>
  *
- * @copyright  CurYearUpdatedByBumpVersion Standing Cloud, Inc.
+ * @copyright  2011 Standing Cloud, Inc.
  */
 
 
