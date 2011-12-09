@@ -46,10 +46,7 @@ Contributors
 TODO
 ----
 
-1. Add support for other versions of Drupal (6.x).
-2. Output (display) the version of Drupal that your site is currently running.
-3. Display a warning message if you are exporting from an untested version of Drupal.
-4. Check for multi-site and handle (even if 'handle' is just warn or errorout at this time).
-5. Check for/handle lack of common commands (tar/touch/mysqldump/etc...).
-6. Add support to other operating systems: Windows, Mac.
-7. Any ideas? Tell me!
+1. Check for multi-site and handle (even if 'handle' is just warn or errorout at this time).
+2. Check for/handle lack of common commands (tar/touch/mysqldump/etc...).
+3. Add support to other operating systems: Windows, Mac.
+4. Any ideas? Tell me!
