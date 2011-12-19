@@ -142,6 +142,9 @@ mv ${WWW_CODE_DIR} ${TMPFILE}
 # Extract the archive to the home directory
 tar --directory="${HOME}" --overwrite --no-same-permissions -xjf ${ARCHIVE}
 
+# If the extracted directory isn't 'htdocs', rename it to htdocs
+[ "${EXTRACT_DIR%/}" != "htdocs" ] && mv ${HOME}/${EXTRACT_DIR%/} ${WWW_CODE_DIR}
+
 # Find the sql file
 LOCATION_OF_SQL_FILE=''
 for dir in $POSSIBLE_LOCATIONS_FOR_SQL_FILE; do
@@ -154,9 +157,6 @@ if [ -z "$LOCATION_OF_SQL_FILE" ] ; then
 	printf "$SCRIPT:$LINENO: could not find a sql file to restore\n" >&2
 	exit 192
 fi
-
-# If the extracted directory isn't 'htdocs', rename it to htdocs
-[ "${EXTRACT_DIR%/}" != "htdocs" ] && mv ${HOME}/${EXTRACT_DIR%/} ${WWW_CODE_DIR}
 
 # Recreate the database and then restore the database from the archive
 sed -i -e "/^CREATE DATABASE/d" -e "/^USE/d" ${LOCATION_OF_SQL_FILE}
