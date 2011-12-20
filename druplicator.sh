@@ -87,12 +87,6 @@ fixPermissions ()
 		find ${WWW_CODE_DIR} -type d -exec setfacl -m g:${thisuser}:rwx {} \;
 		setfacl -R -d -m u:${thisuser}:rwx ${WWW_CODE_DIR}
 	done
-
-
-	#-------------------------------------------------------------------------------
-	#  MAKE DRUPAL HAPPY ABOUT PERMISSIONS
-	#-------------------------------------------------------------------------------
-	chmod g-w ${WWW_CODE_DIR}/sites/default ${WWW_CODE_DIR}/sites/default/settings.php
 }	# ----------  end of SYSTEM_USERPermissions  ----------
 
 
@@ -169,25 +163,40 @@ rmdir ${LOCATION_OF_SQL_FILE%/*}
 
 
 #-------------------------------------------------------------------------------
-#  RECONNECT THEIR APPLICATION TO THE DATABASE
-#-------------------------------------------------------------------------------
-cp -a ${WWW_CODE_DIR}/sites/default/settings.php ${HOME}/tmp/
-problemWithInlineChanges='no'
-sed -i "s/^\(\s*'database'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_NAME}\2/" ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
-sed -i "s/^\(\s*'username'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_USER}\2/" ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
-sed -i "s/^\(\s*'password'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_PASS}\2/" ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
-sed -i "s/^\(\s*'host'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_HOST}\2/"     ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
-
-if [ "${problemWithInlineChanges}" == 'yes' ]; then
-	echo -e "\n\n\e[1;31mNOTICE:\033[0m Moving your 'sites/default/settings.php' to '${HOME}/tmp/settings.php' and replacing with the original settings.php (So that your application will be able to connect to the database)\n\n"
-	cp -a /tmp/htdocs/sites/default/settings.php ${WWW_CODE_DIR}/sites/default/settings.php
-fi
-
-
-#-------------------------------------------------------------------------------
 #  FIX PERMISSIONS
 #-------------------------------------------------------------------------------
 fixPermissions
+
+
+#-------------------------------------------------------------------------------
+#  RECONNECT THEIR APPLICATION TO THE DATABASE
+#-------------------------------------------------------------------------------
+# Clear all permissions and make sure that we can edit settings.php
+setfacl --remove-all --remove-default ${WWW_CODE_DIR}/sites/default ${WWW_CODE_DIR}/sites/default/settings.php
+chmod 777 ${WWW_CODE_DIR}/sites/default/settings.php
+chmod 777 ${WWW_CODE_DIR}/sites/default
+
+	# Make a backup of settings.php from the old site
+	cp -af ${TMPFILE}/sites/default/settings.php ${HOME}/tmp/
+
+	# Try to fix settings.php nicely.
+	problemWithInlineChanges='no'
+	sed -i "s/^\(\s*'database'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_NAME}\2/" ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
+	sed -i "s/^\(\s*'username'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_USER}\2/" ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
+	sed -i "s/^\(\s*'password'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_PASS}\2/" ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
+	sed -i "s/^\(\s*'host'\s*=>\s*'\)[^']*\(.*\)$/\1${MY_HOST}\2/"     ${WWW_CODE_DIR}/sites/default/settings.php || problemWithInlineChanges='yes'
+	
+	if [ "${problemWithInlineChanges}" == 'yes' ]; then
+		echo -e "\n\n\e[1;31mNOTICE:\033[0m Moving your 'sites/default/settings.php' to '${HOME}/tmp/settings.php' and replacing with the original settings.php (So that your application will be able to connect to the database)\n\n"
+		cp -af ${HOME}/tmp/settings.php ${WWW_CODE_DIR}/sites/default/settings.php
+	
+		# Remove Memcache, APC, and Varnish from settings.php
+		sed -i '/\/\/ Memcache Configuration/,$d' htdocs/sites/default/settings.php
+	fi
+
+# Fix permissions based on what was set beforehand by our install scripts...
+getfacl ${TMPFILE}/sites/default/settings.php | setfacl --set-file=- ${WWW_CODE_DIR}/sites/default/settings.php
+getfacl --access ${TMPFILE}/sites/default | setfacl -d -M- ${WWW_CODE_DIR}/sites/default
 
 
 #===============================================================================
