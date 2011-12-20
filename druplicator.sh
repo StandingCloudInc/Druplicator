@@ -48,7 +48,7 @@ POSSIBLE_LOCATIONS_FOR_SQL_FILE="${WWW_CODE_DIR}/sites/default/files/${BACKUP_DI
 fixPermissions ()
 {
 	# Reset all permissions for this user
-	find ${WWW_CODE_DIR} -depth -exec setfacl --remove-all --remove-default {} \;
+	find ${WWW_CODE_DIR} -depth -exec setfacl --remove-all --remove-default {} \; >/dev/null 2>&1
 
 	local existingusers='www-data'
 
@@ -62,6 +62,7 @@ fixPermissions ()
 		fi
 	done
 
+
 	#-------------------------------------------------------------------------------
 	#  GIVE OTHER USERS RW ACCESS (www-data for example)
 	#-------------------------------------------------------------------------------
@@ -69,9 +70,9 @@ fixPermissions ()
 	find ${WWW_CODE_DIR} -type d -exec chmod g+s {} \;
 
 	# Setting acls for the user
-	find ${WWW_CODE_DIR} -type f -exec setfacl -m u:${SYSTEM_USER}:rw {} \;
-	find ${WWW_CODE_DIR} -type d -exec setfacl -m u:${SYSTEM_USER}:rwx {} \;
-	setfacl -R -d -m u:${SYSTEM_USER}:rwx ${WWW_CODE_DIR}
+	find ${WWW_CODE_DIR} -type f -exec setfacl -m u:${SYSTEM_USER}:rw {} \; >/dev/null 2>&1
+	find ${WWW_CODE_DIR} -type d -exec setfacl -m u:${SYSTEM_USER}:rwx {} \; >/dev/null 2>&1
+	setfacl -R -d -m u:${SYSTEM_USER}:rwx ${WWW_CODE_DIR} >/dev/null 2>&1
 
 	local thisuser=''
 	for thisuser in $existingusers
@@ -83,10 +84,16 @@ fixPermissions ()
 		fi
 
 		# Setting acls for $thisuser
-		find ${WWW_CODE_DIR} -type f -exec setfacl -m g:${thisuser}:rw {} \;
-		find ${WWW_CODE_DIR} -type d -exec setfacl -m g:${thisuser}:rwx {} \;
-		setfacl -R -d -m u:${thisuser}:rwx ${WWW_CODE_DIR}
+		find ${WWW_CODE_DIR} -type f -exec setfacl -m g:${thisuser}:rw {} \; >/dev/null 2>&1
+		find ${WWW_CODE_DIR} -type d -exec setfacl -m g:${thisuser}:rwx {} \; >/dev/null 2>&1
+		setfacl -R -d -m u:${thisuser}:rwx ${WWW_CODE_DIR} >/dev/null 2>&1
 	done
+
+
+	#-------------------------------------------------------------------------------
+	#  MAKE DRUPAL HAPPY ABOUT PERMISSIONS
+	#-------------------------------------------------------------------------------
+	chmod g-w ${WWW_CODE_DIR}/sites/default ${WWW_CODE_DIR}/sites/default/settings.php
 }	# ----------  end of SYSTEM_USERPermissions  ----------
 
 
@@ -163,21 +170,15 @@ rmdir ${LOCATION_OF_SQL_FILE%/*}
 
 
 #-------------------------------------------------------------------------------
-#  FIX PERMISSIONS
-#-------------------------------------------------------------------------------
-fixPermissions
-
-
-#-------------------------------------------------------------------------------
 #  RECONNECT THEIR APPLICATION TO THE DATABASE
 #-------------------------------------------------------------------------------
-# Clear all permissions and make sure that we can edit settings.php
-setfacl --remove-all --remove-default ${WWW_CODE_DIR}/sites/default ${WWW_CODE_DIR}/sites/default/settings.php
+# Make a backup of settings.php
+cp -af ${WWW_CODE_DIR}/sites/default/settings.php ${HOME}/tmp/
+
+# Clear permissions to make sure that we can edit settings.php
+setfacl --remove-all --remove-default ${WWW_CODE_DIR}/sites/default ${WWW_CODE_DIR}/sites/default/settings.php >/dev/null 2>&1
 chmod 777 ${WWW_CODE_DIR}/sites/default/settings.php
 chmod 777 ${WWW_CODE_DIR}/sites/default
-
-	# Make a backup of settings.php from the old site
-	cp -af ${TMPFILE}/sites/default/settings.php ${HOME}/tmp/
 
 	# Try to fix settings.php nicely.
 	problemWithInlineChanges='no'
@@ -188,15 +189,17 @@ chmod 777 ${WWW_CODE_DIR}/sites/default
 	
 	if [ "${problemWithInlineChanges}" == 'yes' ]; then
 		echo -e "\n\n\e[1;31mNOTICE:\033[0m Moving your 'sites/default/settings.php' to '${HOME}/tmp/settings.php' and replacing with the original settings.php (So that your application will be able to connect to the database)\n\n"
-		cp -af ${HOME}/tmp/settings.php ${WWW_CODE_DIR}/sites/default/settings.php
+		cp -af ${TMPFILE}/sites/default/settings.php ${WWW_CODE_DIR}/sites/default/settings.php
 	
 		# Remove Memcache, APC, and Varnish from settings.php
 		sed -i '/\/\/ Memcache Configuration/,$d' htdocs/sites/default/settings.php
 	fi
 
-# Fix permissions based on what was set beforehand by our install scripts...
-getfacl ${TMPFILE}/sites/default/settings.php | setfacl --set-file=- ${WWW_CODE_DIR}/sites/default/settings.php
-getfacl --access ${TMPFILE}/sites/default | setfacl -d -M- ${WWW_CODE_DIR}/sites/default
+
+#-------------------------------------------------------------------------------
+#  FIX PERMISSIONS
+#-------------------------------------------------------------------------------
+fixPermissions
 
 
 #===============================================================================
