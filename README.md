@@ -2,9 +2,9 @@ Standing Cloud's Druplicator
 ============================
 
 * Author:    Nicholas Henry (<nickh@standingcloud.com>)
-* Date:      Mon Dec 19 23:43:28 UTC 2011
-* Last mod.: Fri Dec 9  13:48:48 2011 -0700
-* Version:   0.0.2.1
+* Date:      Tue Dec 20 01:32:43 UTC 2011
+* Last mod.: Mon Dec 19 18:31:58 2011 -0700
+* Version:   0.0.2.2
 * Website:   <http://www.druplicator.com/>
 * GitHub:    <https://github.com/StandingCloudInc/Druplicator>
 
