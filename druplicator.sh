@@ -31,7 +31,11 @@ ARCHIVE=${1}                                    # the archive if passed
 ARCHIVE=${ARCHIVE:-"${HOME}/tmp/tarArchive.tar.bz2"}  # the archive if not passed
 EXTRACT_DIR=$(tar tjf ${ARCHIVE} 2>/dev/null | head -1)
 TMPFILE=$( mktemp /tmp/htdocs.XXXXXXXXXX ) || exit 1 ; rm --force ${TMPFILE}
-WWW_CODE_DIR="${HOME}/public_html"
+if [[ -d "${HOME}/htdocs" ]]; then
+	WWW_CODE_DIR="${HOME}/htdocs"
+elif [[ -d "${HOME}/public_html" ]]; then
+	WWW_CODE_DIR="${HOME}/public_html"
+fi
 SC_SYSUSER='sc-sysuser'
 SYSTEM_USER="$(whoami)"
 SQL_FILE='mysqlDatabaseDump.sql'
